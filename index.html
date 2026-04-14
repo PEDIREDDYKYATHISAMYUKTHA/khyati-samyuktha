@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>AI Face Shape & Missing Person Detection</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+
+<!-- ================= HEADER ================= -->
+<header class="header">
+    <h2 class="logo">🤖 AI FaceShape System</h2>
+    <nav class="nav">
+        <a href="#home">Home</a>
+        <a href="#upload">Image Detection</a>
+        <a href="#camera">Live Camera</a>
+        <a href="#missing">Missing Person</a>
+        <a href="#about">About</a>
+    </nav>
+</header>
+
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="home">
+    <h1>AI Face Shape Detection System</h1>
+    <p>
+        Upload an image, use live webcam, or detect a missing person
+        from CCTV / mobile video using Artificial Intelligence.
+    </p>
+</section>
+
+
+<!-- ================= IMAGE DETECTION + RESULT ================= -->
+<section class="section" id="upload">
+
+    <h2>📷 Upload Image for Face Shape Detection</h2>
+
+    <input type="file" id="imageInput" accept="image/*">
+    <br><br>
+
+    <img id="previewImage" width="250" style="display:none;" alt="Preview">
+    <br><br>
+
+    <button id="detectBtn">🔍 Detect Face Shape</button>
+
+    <!-- Result shown here -->
+    <div class="result-box" id="resultBox">
+        Face Shape : <span id="faceShape">--</span>
+    </div>
+
+    <img id="outputImage" style="display:none; margin-top:16px; max-width:100%;" alt="Output">
+
+    <div id="hairstyleContainer" style="margin-top:16px; display:none;">
+        <h3>✂️ Recommended Hairstyles</h3>
+        <ul id="hairstyleList"></ul>
+    </div>
+
+</section>
+
+
+<!-- ================= LIVE CAMERA ================= -->
+<section class="section" id="camera">
+
+    <h2>🎥 Live Camera Face Detection</h2>
+
+    <button onclick="startCamera()">▶ Start Camera</button>
+    <button onclick="stopCamera()" style="background:#c0392b; margin-left:10px;">■ Stop Camera</button>
+    <br><br>
+
+    <img id="videoFeed" width="500" style="display:none; max-width:100%;" alt="Camera">
+
+</section>
+
+
+<!-- ================= MISSING PERSON ================= -->
+<section class="section" id="missing">
+
+    <h2>🔍 Missing Person Detection System</h2>
+
+    <p style="margin-bottom:20px; color:#555; font-size:14px;">
+        Upload a reference photo then upload the CCTV / mobile video.
+        The system will scan the <strong>entire video</strong> and show
+        you the best matched frame with accuracy.
+    </p>
+
+
+    <!-- STEP 1 -->
+    <div class="box">
+
+        <h3>Step 1 : Upload Reference Image</h3>
+        <p style="font-size:13px; color:#777; margin-bottom:10px;">
+            Use a clear frontal face photo of the missing person.
+        </p>
+
+        <input type="file" id="referenceImage" accept="image/*">
+        <br><br>
+
+        <img id="referencePreview" width="180" style="display:none;" alt="Reference">
+        <br><br>
+
+        <button id="uploadReferenceBtn" onclick="uploadReference()">
+            ⬆ Upload Reference Image
+        </button>
+
+        <p id="referenceStatus" style="margin-top:8px; font-size:14px;"></p>
+
+    </div>
+
+
+    <hr>
+
+
+    <!-- STEP 2 -->
+    <div class="box">
+
+        <h3>Step 2 : Upload CCTV / Mobile Video</h3>
+        <p style="font-size:13px; color:#777; margin-bottom:10px;">
+            The system will scan the entire video and find the person.
+        </p>
+
+        <input type="file" id="videoInput" accept="video/*">
+        <br><br>
+
+        <video id="videoPreview" controls style="display:none; max-width:100%;"></video>
+        <br><br>
+
+        <button id="uploadVideoBtn" onclick="uploadVideo()">
+            ▶ Start Detection
+        </button>
+
+        <p id="videoStatus" style="margin-top:8px; font-size:14px;"></p>
+
+        <!-- Progress bar -->
+        <div id="progressContainer" style="display:none; margin-top:16px;">
+            <div style="background:#e0f5f0; border-radius:10px; overflow:hidden; height:22px;">
+                <div id="progressBar"
+                     style="background:#11998e; height:100%; width:0%;
+                            transition:width 0.4s ease; border-radius:10px;">
+                </div>
+            </div>
+            <p id="progressText"
+               style="font-size:13px; color:#555; margin-top:6px; text-align:center;">
+            </p>
+        </div>
+
+    </div>
+
+
+    <hr>
+
+
+    <!-- OUTPUT -->
+    <div class="box">
+
+        <h3>📺 Detection Result</h3>
+
+        <p id="detectMessage"
+           style="font-weight:bold; font-size:1.1rem; margin-bottom:12px;">
+        </p>
+
+        <div id="detectedBox" style="display:none; margin-top:10px;">
+            <h3 style="color:#11998e; margin-bottom:8px;">
+                📸 Best Matched Frame :
+            </h3>
+            <img id="detectedImage"
+                 style="max-width:100%; border-radius:10px;
+                        border:3px solid #11998e;"
+                 alt="Detected person">
+        </div>
+
+    </div>
+
+</section>
+
+
+<!-- ================= ABOUT ================= -->
+<section class="section" id="about">
+
+    <h2>About This Project</h2>
+
+    <p>
+        This system detects human face shapes using deep learning and
+        recommends suitable hairstyles. It also includes a Missing Person
+        Detection module that scans entire CCTV or mobile videos and
+        identifies the reference person with accuracy percentage.
+    </p>
+
+    <h3 style="margin-top:20px;">Technologies Used</h3>
+    <ul style="margin-top:10px;">
+        <li>Python & Flask</li>
+        <li>OpenCV</li>
+        <li>MediaPipe Face Mesh (468 Landmarks)</li>
+        <li>Face Recognition Library (dlib)</li>
+        <li>Deep Learning CNN Model (TensorFlow / Keras)</li>
+        <li>HTML, CSS, JavaScript</li>
+    </ul>
+
+    <h3 style="margin-top:20px;">Features</h3>
+    <ul style="margin-top:10px;">
+        <li>✅ Face shape detection (Heart, Oval, Round, Square, Oblong)</li>
+        <li>✅ Hairstyle recommendation based on face shape</li>
+        <li>✅ Live webcam face detection</li>
+        <li>✅ Scans ENTIRE video at once</li>
+        <li>✅ Only detects reference person — ignores all other faces</li>
+        <li>✅ Blue box + blue tick ✓ on matched person</li>
+        <li>✅ Accuracy % shown on best matched frame</li>
+        <li>✅ Progress bar while scanning</li>
+        <li>✅ Alert sound when person is found</li>
+    </ul>
+
+</section>
+
+
+<!-- ================= FOOTER ================= -->
+<footer class="footer">
+    <p>© 2026 AI Face Shape Detection & Missing Person System</p>
+</footer>
+
+
+<!-- ================= ALERT SOUND ================= -->
+<audio id="alertSound">
+    <source src="{{ url_for('static', filename='alert.mp3') }}" type="audio/mpeg">
+</audio>
+
+
+<!-- ================= SCRIPT ================= -->
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+
+</body>
+</html>
